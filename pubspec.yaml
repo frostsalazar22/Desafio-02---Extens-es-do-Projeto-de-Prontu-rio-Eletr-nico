@@ -36,11 +36,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # 📦 Caso venha a adicionar assets (ex: imagens, ícones personalizados)
-  assets:
-    - assets/images/
-    - assets/icons/
-
 # 🩺 Configuração do splash screen (flutter_native_splash)
 flutter_native_splash:
   color: "#ffffff"
