@@ -1,7 +1,6 @@
-name: flutter_firebase
-description: "A new Flutter project."
-
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+name: prontuario_flutter
+description: "Aplicativo de Prontuário Eletrônico com Firebase e Flutter"
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -12,20 +11,51 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # 🔥 Firebase e Firestore
   firebase_core: ^3.5.0
   cloud_firestore: ^5.4.4
   firebase_auth: ^5.3.1
+
+  # 🌎 Localização, formatação e data
+  flutter_localizations:
+    sdk: flutter
   intl: ^0.20.2
 
-
+  # 🎨 Ícones e componentes visuais
   cupertino_icons: ^1.0.8
+
+  # 🖼️ Splash screen e ícones customizados (tema clínico)
+  flutter_native_splash: ^2.4.1
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
 flutter:
-
   uses-material-design: true
+
+  # 📦 Caso venha a adicionar assets (ex: imagens, ícones personalizados)
+  assets:
+    - assets/images/
+    - assets/icons/
+
+# 🩺 Configuração do splash screen (flutter_native_splash)
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/splash_logo.png
+  branding: assets/images/branding.png
+  branding_mode: bottom
+  android_12:
+    color: "#ffffff"
+    image: assets/images/splash_logo.png
+  web: false
+
+# 🏥 Configuração de ícone do aplicativo (flutter_launcher_icons)
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"

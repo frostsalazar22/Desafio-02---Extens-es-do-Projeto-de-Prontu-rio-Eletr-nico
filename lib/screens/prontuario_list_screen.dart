@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 📅 para formatar data
+import 'package:intl/intl.dart';
 import '../models/prontuario.dart';
 import '../services/firestore_service.dart';
 import 'formulario_prontuario_screen.dart';
+import 'editar_prontuario_screen.dart'; // Importar a tela de edição
 
 class ProntuarioListScreen extends StatelessWidget {
   final FirestoreService firestoreService = FirestoreService();
 
-  ProntuarioListScreen({super.key}); // ✅ removido o const aqui
+  ProntuarioListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,20 +51,57 @@ class ProntuarioListScreen extends StatelessWidget {
             itemCount: prontuarios.length,
             itemBuilder: (context, index) {
               final p = prontuarios[index];
-              final dataFormatada = dateFormat.format(p.data);
+              final dataCriacao = dateFormat.format(p.data);
+              final idade = DateTime.now().year - p.dataNascimento.year;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                elevation: 2,
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
-                  leading: const Icon(Icons.person, color: Colors.green),
-                  title: Text(
-                    p.paciente,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  onTap: () {
+                    // Navegar para a tela de edição passando o prontuário
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditarProntuarioScreen(prontuario: p),
+                      ),
+                    );
+                  },
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.green.shade100,
+                    child: const Icon(Icons.person, color: Colors.green),
                   ),
-                  subtitle: Text(
-                    '${p.descricao}\n📅 $dataFormatada',
-                    style: const TextStyle(color: Colors.black54),
+                  title: Text(
+                    p.nomeCompleto,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Idade: $idade anos',
+                          style: const TextStyle(color: Colors.black87),
+                        ),
+                        if (p.convenio.isNotEmpty)
+                          Text('Convênio: ${p.convenio}',
+                              style: const TextStyle(color: Colors.black87)),
+                        if (p.alergias.isNotEmpty)
+                          Text('Alergias: ${p.alergias}',
+                              style: const TextStyle(color: Colors.black54)),
+                        Text(
+                          '📅 Criado em: $dataCriacao',
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+                      ],
+                    ),
                   ),
                   isThreeLine: true,
                   trailing: IconButton(
@@ -73,8 +111,8 @@ class ProntuarioListScreen extends StatelessWidget {
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text('Excluir prontuário'),
-                          content: const Text(
-                            'Tem certeza que deseja excluir este prontuário?',
+                          content: Text(
+                            'Deseja realmente excluir o prontuário de "${p.nomeCompleto}"?',
                           ),
                           actions: [
                             TextButton(
@@ -83,7 +121,10 @@ class ProntuarioListScreen extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text('Excluir'),
+                              child: const Text(
+                                'Excluir',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
                             ),
                           ],
                         ),
@@ -92,8 +133,9 @@ class ProntuarioListScreen extends StatelessWidget {
                       if (confirmar == true) {
                         await firestoreService.deletarProntuario(p.id!);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Prontuário excluído com sucesso!'),
+                          SnackBar(
+                            content: Text(
+                                'Prontuário de ${p.nomeCompleto} excluído com sucesso!'),
                             backgroundColor: Colors.redAccent,
                           ),
                         );

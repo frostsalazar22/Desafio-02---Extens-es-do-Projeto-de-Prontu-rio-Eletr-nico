@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/prontuario.dart';
 
 class FirestoreService {
-  // Referência fortemente tipada à coleção "prontuarios"
+  // Referência à coleção "prontuarios" no Firestore
   final CollectionReference<Map<String, dynamic>> _prontuarios =
       FirebaseFirestore.instance.collection('prontuarios');
 
@@ -30,9 +30,21 @@ class FirestoreService {
             return Prontuario.fromMap(doc.id, doc.data());
           } catch (e) {
             print('⚠️ [Firestore] Erro ao converter documento ${doc.id}: $e');
+            // Retorna um registro "inválido" para evitar crash da lista
             return Prontuario(
               id: doc.id,
-              paciente: 'Desconhecido',
+              nomeCompleto: 'Desconhecido',
+              dataNascimento: DateTime(2000, 1, 1),
+              sexo: '',
+              cpf: '',
+              endereco: '',
+              telefone: '',
+              email: '',
+              convenio: '',
+              numeroCarteirinha: '',
+              alergias: '',
+              doencasPreExistentes: '',
+              medicamentosEmUso: '',
               descricao: 'Erro ao ler dados',
               data: DateTime.now(),
             );
@@ -42,7 +54,7 @@ class FirestoreService {
     );
   }
 
-  /// 🟡 Retorna um único prontuário pelo ID (útil para edição)
+  /// 🟡 Retorna um único prontuário pelo ID (para visualização ou edição)
   Future<Prontuario?> getProntuarioPorId(String id) async {
     try {
       final doc = await _prontuarios.doc(id).get();
@@ -54,7 +66,7 @@ class FirestoreService {
     }
   }
 
-  /// 🟠 Atualiza um prontuário existente (para uso futuro)
+  /// 🟠 Atualiza um prontuário existente
   Future<void> updateProntuario(String id, Prontuario prontuario) async {
     try {
       await _prontuarios.doc(id).update(prontuario.toMap());
@@ -68,7 +80,7 @@ class FirestoreService {
     }
   }
 
-  /// 🔴 Deleta um prontuário pelo ID do documento
+  /// 🔴 Deleta um prontuário pelo ID
   Future<void> deletarProntuario(String id) async {
     try {
       await _prontuarios.doc(id).delete();
@@ -79,6 +91,28 @@ class FirestoreService {
     } catch (e) {
       print('❌ [Firestore] Erro desconhecido ao deletar prontuário: $e');
       rethrow;
+    }
+  }
+
+  /// 🔍 (Opcional) Pesquisa por nome do paciente
+  Stream<List<Prontuario>> buscarPorNome(String nome) {
+    return _prontuarios
+        .where('nomeCompleto', isGreaterThanOrEqualTo: nome)
+        .where('nomeCompleto', isLessThanOrEqualTo: '$nome\uf8ff')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Prontuario.fromMap(doc.id, doc.data()))
+            .toList());
+  }
+
+  /// 📊 (Opcional) Conta o total de prontuários registrados
+  Future<int> contarProntuarios() async {
+    try {
+      final snapshot = await _prontuarios.get();
+      return snapshot.size;
+    } catch (e) {
+      print('⚠️ [Firestore] Erro ao contar prontuários: $e');
+      return 0;
     }
   }
 }
