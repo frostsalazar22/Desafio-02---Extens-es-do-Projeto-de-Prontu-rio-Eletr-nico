@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "292364974425",
+    "project_id": "prontuario-flutter",
+    "storage_bucket": "prontuario-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292364974425:android:05607af3572eb3472a3448",
+        "android_client_info": {
+          "package_name": "com.example.flutter_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY_v0W904VvC5tOTA9XAefyjoLsSSsZ50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292364974425:android:16347a679b0906792a3448",
+        "android_client_info": {
+          "package_name": "com.pontuario.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY_v0W904VvC5tOTA9XAefyjoLsSSsZ50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
