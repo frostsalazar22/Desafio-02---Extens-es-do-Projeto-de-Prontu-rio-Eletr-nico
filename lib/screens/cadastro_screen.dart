@@ -23,6 +23,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   bool _isLoading = false;
 
+  /// 📅 Abre o seletor de data de nascimento
   Future<void> _selecionarDataNascimento() async {
     final selecionada = await showDatePicker(
       context: context,
@@ -36,6 +37,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     }
   }
 
+  /// 🧾 Cadastro do paciente com verificação de duplicidade
   Future<void> _cadastrarPaciente() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -44,18 +46,48 @@ class _CadastroScreenState extends State<CadastroScreen> {
     try {
       final cpf = _cpfController.text.replaceAll(RegExp(r'\D'), '');
       final nascimento = _dateFormat.parse(_dataNascimentoController.text);
-      final email = '$cpf@gmail.com'; // padrão de email
-      final senha = DateFormat('ddMMyyyy').format(nascimento); // senha: data nascimento
+      final email = '$cpf@gmail.com'; // padrão de email (cpf@gmail.com)
+      final senha = DateFormat('ddMMyyyy').format(nascimento); // senha = data nascimento
       final auth = FirebaseAuth.instance;
       final firestore = FirebaseFirestore.instance;
 
-      // Cria no Firebase Auth
+      // 🟡 1. Verifica se o email já existe no Firebase Auth
+      final methods = await auth.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Já existe um usuário com este CPF cadastrado!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // 🟡 2. Verifica se o CPF já está registrado no Firestore
+      final query = await firestore
+          .collection('usuarios')
+          .where('cpf', isEqualTo: cpf)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('CPF já cadastrado no sistema!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // 🟢 3. Cria o usuário no Firebase Auth
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: senha,
       );
 
-      // Salva no Firestore
+      // 🟢 4. Salva o usuário no Firestore
       final novoUsuario = Usuario(
         cpf: cpf,
         nomeCompleto: _nomeController.text,
@@ -78,11 +110,19 @@ class _CadastroScreenState extends State<CadastroScreen> {
           backgroundColor: Colors.green,
         ),
       );
+
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao cadastrar: ${e.message}'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro inesperado: $e'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -148,7 +188,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
               ),
               TextFormField(
                 controller: _enderecoController,
-                decoration: const InputDecoration(labelText: 'Endereço completo'),
+                decoration:
+                    const InputDecoration(labelText: 'Endereço completo'),
               ),
               const SizedBox(height: 24),
               _isLoading

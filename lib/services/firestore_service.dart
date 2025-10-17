@@ -6,7 +6,7 @@ class FirestoreService {
   final CollectionReference<Map<String, dynamic>> _prontuarios =
       FirebaseFirestore.instance.collection('prontuarios');
 
-  /// 🟢 Adiciona um novo prontuário no Firestore
+  /// Adiciona um novo prontuário no Firestore
   Future<void> adicionarProntuario(Prontuario prontuario) async {
     try {
       await _prontuarios.add(prontuario.toMap());
@@ -21,7 +21,7 @@ class FirestoreService {
     }
   }
 
-  /// 🔵 Retorna um stream com todos os prontuários em tempo real (ordenados por data)
+  /// Retorna um stream com todos os prontuários em tempo real (ordenados por data)
   Stream<List<Prontuario>> listarProntuarios() {
     return _prontuarios.orderBy('data', descending: true).snapshots().map(
       (snapshot) {
@@ -54,7 +54,7 @@ class FirestoreService {
     );
   }
 
-  /// 🟡 Retorna um único prontuário pelo ID (para visualização ou edição)
+  /// Retorna um único prontuário pelo ID (para visualização ou edição)
   Future<Prontuario?> getProntuarioPorId(String id) async {
     try {
       final doc = await _prontuarios.doc(id).get();
@@ -66,7 +66,7 @@ class FirestoreService {
     }
   }
 
-  /// 🟠 Atualiza um prontuário existente
+  /// Atualiza um prontuário existente
   Future<void> updateProntuario(String id, Prontuario prontuario) async {
     try {
       await _prontuarios.doc(id).update(prontuario.toMap());
@@ -80,7 +80,7 @@ class FirestoreService {
     }
   }
 
-  /// 🔴 Deleta um prontuário pelo ID
+  /// Deleta um prontuário pelo ID
   Future<void> deletarProntuario(String id) async {
     try {
       await _prontuarios.doc(id).delete();
@@ -94,7 +94,7 @@ class FirestoreService {
     }
   }
 
-  /// 🔍 (Opcional) Pesquisa por nome do paciente
+  /// Pesquisa por nome do paciente
   Stream<List<Prontuario>> buscarPorNome(String nome) {
     return _prontuarios
         .where('nomeCompleto', isGreaterThanOrEqualTo: nome)
@@ -105,7 +105,7 @@ class FirestoreService {
             .toList());
   }
 
-  /// 📊 (Opcional) Conta o total de prontuários registrados
+  /// Conta o total de prontuários registrados
   Future<int> contarProntuarios() async {
     try {
       final snapshot = await _prontuarios.get();
